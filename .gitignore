@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Environment files (contain secrets) — ignore all env variants
+.env
+.env.local
+.env.*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -23,20 +28,20 @@ dist-ssr
 *.sln
 *.sw?
 
-# Environment files (keep secrets out of git)
-.env
-.env.local
-.env.*
-
-# Common caches, coverage, and editor history
-.cache/
-.parcel-cache/
-.history/
-coverage/
-
-# Android / Capacitor related local files or keys
-google-services.json
+# Common secret/key file types
 *.jks
 *.keystore
 *.p12
 *.pem
+
+# Firebase/Google Android service file (often contains API keys)
+google-services.json
+
+# Caches / coverage
+.cache/
+.parcel-cache/
+coverage/
+.history/
+
+.vercel
+.env*.local
