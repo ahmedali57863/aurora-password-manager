@@ -1,13 +1,4 @@
 import CryptoJS from 'crypto-js';
-
-// App-wide key for things that need to be readable by the app but hidden from casual view (like the user list)
-// This value is no longer hardcoded. It is read from environment variables.
-// For vite (client): set VITE_APP_SECRET_KEY in your .env
-// For Node/SSR scripts: set APP_SECRET_KEY or VITE_APP_SECRET_KEY in process.env
-// NOTE: storing a static app-wide secret in client builds is visible to users — prefer per-user keys when possible.
-// Resolve the app secret in a way Vite/esbuild can parse and that works in server and client
-// - Vite builds will replace `import.meta.env.VITE_APP_SECRET_KEY` at build time
-// - On Node servers we fall back to process.env
 let _appSecret = null;
 try {
     // import.meta.env is available in Vite's module environment. Use optional chaining so esbuild can parse it.
