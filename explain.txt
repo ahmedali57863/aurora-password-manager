@@ -1,0 +1,79 @@
+# Aurora Vault (PassOP) - Project Explanation
+
+## 1. Project Overview
+Aurora Vault (internally known as PassOP) is a secure, client-side password manager built with modern web technologies. It focuses on privacy, security, and a premium "futuristic" user experience. The application allows users to store their credentials (website, username, password) securely in their browser's local storage, ensuring that sensitive data never leaves their device without encryption.
+
+## 2. Technology Stack & Plugins
+The project utilizes a robust stack to ensure performance and aesthetics:
+
+*   **Core Framework:** React (v18+) with Vite for fast development and building.
+*   **Styling:** Tailwind CSS for utility-first styling, enabling complex designs like glassmorphism and gradients easily.
+*   **Routing:** `react-router-dom` for handling navigation between Login, Manager, and About pages.
+*   **Encryption:** `crypto-js` for AES encryption (data protection) and SHA256 hashing (authentication).
+*   **Icons:** `react-icons` for accessing FontAwesome and other icon sets (FaEye, FaTrash, etc.).
+*   **Notifications:** `react-toastify` for sleek, non-intrusive user alerts (success/error messages).
+*   **Animations:** Custom Canvas animations (in Navbar) and CSS transitions.
+
+## 3. Detailed File Breakdown
+
+### A. `src/components/Manager.jsx` (The Core)
+This is the main dashboard of the application where users manage their passwords.
+*   **State Management:** Uses `useState` to manage the password list (`passwordArray`), the current form input (`form`), password visibility toggles, and the "editing" state.
+*   **Initialization (`useEffect`):**
+    *   Checks if a user is logged in (`currentUser` in localStorage). If not, redirects to Login.
+    *   Decrypts the user's data to get their "Master Key" (raw password).
+    *   Fetches the encrypted password vault (`[username]_passwords`) from localStorage.
+    *   Decrypts the vault using the user's Master Key. This ensures that even if someone accesses the localStorage, they cannot read the passwords without the user's login credentials.
+*   **Security Logic:**
+    *   **`savePassword`:** Validates inputs, adds/updates the password in the state, and then **re-encrypts** the entire list before saving it back to localStorage.
+    *   **`checkStrength`:** Real-time analysis of the password field to update the strength meter bar (Red -> Green).
+*   **UI Features:**
+    *   Glassmorphism card design.
+    *   Interactive password strength meter.
+    *   Copy-to-clipboard functionality for all fields.
+    *   Edit and Delete actions with confirmation.
+
+### B. `src/utils/encryption.js` (The Security Layer)
+This utility file handles all cryptographic operations.
+*   **`APP_SECRET_KEY`:** A constant key used for encrypting "public" metadata like the list of users (so user lists aren't plain text).
+*   **`encryptData(data, key)`:** Converts a JavaScript object/array into a JSON string and encrypts it using AES (Advanced Encryption Standard).
+*   **`decryptData(ciphertext, key)`:** Reverses the process. It includes error handling to safely return `null` or try legacy parsing if decryption fails.
+*   **`hashPassword(password)`:** Uses SHA256 to create a one-way hash of the user's login password. We store this hash to verify logins without ever saving the actual password in plain text.
+
+### C. `src/components/Login.jsx` (Authentication)
+Handles user onboarding and access control.
+*   **Dual Mode:** Toggles between "Login" and "Sign Up" forms.
+*   **Sign Up:**
+    *   Hashes the user's password.
+    *   Stores the new user in the `users` array in localStorage (encrypted).
+*   **Login:**
+    *   Hashes the input password and compares it with the stored hash.
+    *   **Critical Step:** If valid, it stores the **RAW** password in a temporary `currentUser` session object (encrypted with the App Key). This raw password is required by `Manager.jsx` to decrypt the user's personal vault.
+
+### D. `src/components/Navbar.jsx` (Navigation & Visuals)
+*   **Navigation:** Links to Home (Manager) and About pages. Handles "Logout" by clearing the session.
+*   **Visual Effects:** Contains a `<canvas>` element that renders a "Data Stream" particle animation.
+    *   Uses JavaScript to draw moving cyan lines/particles on a canvas overlay, creating a high-tech, cyberpunk aesthetic.
+    *   Responsive design with a mobile hamburger menu.
+
+### E. `src/components/About.jsx` (Information)
+*   A static page that reinforces the brand identity.
+*   Explains the "Client-Side Security" model (Zero Knowledge).
+*   Uses the same shared background and design language as the rest of the app.
+
+### F. `src/App.jsx` (Routing)
+*   Sets up the `RouterProvider`.
+*   Defines routes:
+    *   `/`: Login Page
+    *   `/manager`: Main Dashboard (wrapped with Navbar)
+    *   `/about`: About Page (wrapped with Navbar)
+
+## 4. Workflow Summary
+1.  **User Arrives:** Sees Login page.
+2.  **Authentication:** Enters credentials. App verifies hash.
+3.  **Session Start:** App saves encrypted session. Redirects to `/manager`.
+4.  **Vault Unlock:** `Manager.jsx` reads session, decrypts it to get the key, then decrypts the user's specific password vault.
+5.  **Operation:** User adds a password. App updates state, encrypts the new list with the key, and saves to localStorage.
+6.  **Logout:** Session is wiped. Key is lost from memory. Vault remains encrypted on disk.
+
+This architecture ensures a balance between convenience (web-based) and security (client-side encryption).
