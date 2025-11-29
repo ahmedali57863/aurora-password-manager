@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import Navbar from './components/navbar.jsx'
+import Navbar from './components/Navbar.jsx'
 import Manager from './components/Manager.jsx'
 import Login from './components/Login.jsx'
 import './fonts.css';
